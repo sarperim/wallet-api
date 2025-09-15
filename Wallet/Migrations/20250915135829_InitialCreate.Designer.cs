@@ -12,7 +12,7 @@ using Wallet.Data;
 namespace Wallet.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    [Migration("20250915083714_InitialCreate")]
+    [Migration("20250915135829_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -95,9 +95,6 @@ namespace Wallet.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -106,9 +103,6 @@ namespace Wallet.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RefreshTokenExpiry")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Username")

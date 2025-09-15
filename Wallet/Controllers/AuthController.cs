@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Formats.Asn1;
 using Wallet.Entities;
 using Wallet.Entities.DTO;
 using Wallet.Services;
@@ -22,14 +23,14 @@ namespace Wallet.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<string>> Login(UserDTO request)
+        public async Task<ActionResult<TokenDTO>> Login(UserDTO request)
         {
-            var token = await authService.LoginAsync(request);
-            if (token == null)
+            var tokens = await authService.LoginAsync(request);
+            if (tokens == null)
             {
                 return BadRequest("Invalid Username or Password");
             }
-            return Ok(token);
+            return Ok(tokens);
         }
 
         [Authorize]
@@ -38,5 +39,18 @@ namespace Wallet.Controllers
         {
             return Ok("You are user.");
         }
+
+        [HttpPost("RefreshToken")]
+
+        public async Task<ActionResult<TokenDTO>> RefreshToken(RefreshTokenDTO request)
+        {
+            var result = await authService.RefreshTokensAsync(request);
+            if (result is null || result.AccessToken is null || result.RefreshToken is null)
+            {
+                return Unauthorized("invalid token");
+            }
+            return Ok(result);
+        }
+
     }
 }
