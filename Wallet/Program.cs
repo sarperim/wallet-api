@@ -53,6 +53,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<WalletDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
     options =>
     {
