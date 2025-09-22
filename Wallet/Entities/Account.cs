@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using System.Transactions;
+using System.ComponentModel.DataAnnotations;
 
 namespace Wallet.Entities
 {
@@ -7,6 +8,7 @@ namespace Wallet.Entities
     {
         public Guid Id { get; set; } // PK
         public Guid UserId { get; set; } // FK to User
+        [MaxLength(255)]
         public string CurrencyType { get; set; } = null!;
         public decimal Balance { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

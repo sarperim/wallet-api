@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-
+using System.ComponentModel.DataAnnotations;
 namespace Wallet.Entities
 {
     public class Transaction
@@ -10,9 +10,11 @@ namespace Wallet.Entities
         public decimal Amount { get; set; }
 
         // Only for Exchange transactions
+        [MaxLength(255)]
         public string? TargetCurrency { get; set; }
         public decimal? ExchangeRate { get; set; }
 
+        [MaxLength(255)]
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

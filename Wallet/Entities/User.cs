@@ -10,6 +10,7 @@ namespace Wallet.Entities
         public string Username { get; set; } = null!;
         [MaxLength(255)]
         public string PasswordHash { get; set; } = null!;
+        [MaxLength(255)]
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
       

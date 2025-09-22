@@ -1,20 +1,28 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Formats.Asn1;
 using Wallet.Entities;
 using Wallet.Entities.DTO;
+using Wallet.Entities.Validators;
 using Wallet.Services;
 
 namespace Wallet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(IAuthService authService) : ControllerBase
+    public class AuthController(IAuthService authService,IValidator<UserDTO> userValidator) : ControllerBase
     {
         [HttpPost("Register")]
         public async Task<ActionResult<User>> Register(UserDTO request)
         {
+            var validatorResult = await userValidator.ValidateAsync(request);
+            if (!validatorResult.IsValid)
+            {
+                return BadRequest(validatorResult.Errors);
+            }
+
             var user = await authService.RegisterAsync(request);
             if (user == null) {
                 return BadRequest("User Exist.");
@@ -25,6 +33,12 @@ namespace Wallet.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult<TokenDTO>> Login(UserDTO request)
         {
+            var validatorResult = await userValidator.ValidateAsync(request);
+            if (!validatorResult.IsValid)
+            {
+                return BadRequest(validatorResult.Errors);
+            }
+
             var tokens = await authService.LoginAsync(request);
             if (tokens == null)
             {
