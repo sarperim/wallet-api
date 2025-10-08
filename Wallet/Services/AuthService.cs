@@ -11,11 +11,12 @@ using Wallet.Entities.DTO;
 
 namespace Wallet.Services
 {
-    public class AuthService(WalletDbContext context,IConfiguration configuration):IAuthService
+    public class AuthService(WalletDbContext context,IConfiguration configuration,IUnitOfWork uow):IAuthService
     {
+
         public async Task<TokenDTO?> LoginAsync(UserDTO request)
         {
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+            var user = await uow.Users.Query().FirstOrDefaultAsync(u => u.Username == request.Username);
             if (user == null)
             {
                 return null;
@@ -40,7 +41,7 @@ namespace Wallet.Services
 
         public async Task<User?> RegisterAsync(UserDTO request)
         {
-            if(await context.Users.AnyAsync(u => u.Username == request.Username))
+            if(await uow.Users.Query().AnyAsync(u => u.Username == request.Username))
             {
                 return null;
             }
@@ -49,8 +50,8 @@ namespace Wallet.Services
                 Username = request.Username
             };
             user.PasswordHash = new PasswordHasher<User>().HashPassword(user, request.Password);
-            context.Users.Add(user);
-            context.SaveChanges();
+            uow.Users.AddAsync(user);
+            uow.SaveChangesAsync();
         
             return user ;
         }
@@ -86,13 +87,13 @@ namespace Wallet.Services
             var refreshToken = GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-            await context.SaveChangesAsync();
+            await uow.SaveChangesAsync();
             return refreshToken;
         }
 
         private async Task<User?> ValidateRefreshTokenAsync(Guid userId, string refreshToken)
         {
-            var user = await context.Users.FindAsync(userId);
+            var user = await uow.Users.GetByIdAsync(userId);
             if(user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.UtcNow)
             {
                 return null;

@@ -12,10 +12,12 @@ namespace Wallet.Services
     {
         private readonly HttpClient _httpClient;
         private readonly WalletDbContext _context;
-        public CurrencyService(IHttpClientFactory httpClientFactory, WalletDbContext context)
+        private readonly IUnitOfWork _uow;
+        public CurrencyService(IHttpClientFactory httpClientFactory, WalletDbContext context, IUnitOfWork uow)
         {
             _httpClient = httpClientFactory.CreateClient();
             _context = context;
+            _uow = uow;
         }
 
         public async Task<Account?> BuyUsdAsync(USDamountDTO request, Guid userId)
@@ -50,7 +52,7 @@ namespace Wallet.Services
                 return null;
             }
             tlAccount.Balance -= requiredTl;
-            var usdAccount = await _context.Accounts
+            var usdAccount = await _uow.Accounts.Query()
                   .FirstOrDefaultAsync(x => x.UserId == userId && x.CurrencyType == "US DOLLAR");
 
             if (usdAccount == null)
@@ -61,7 +63,7 @@ namespace Wallet.Services
                     CurrencyType = "US DOLLAR",
                     Balance = 0m
                 };
-                _context.Accounts.Add(usdAccount);
+                _uow.Accounts.AddAsync(usdAccount);
             }
             usdAccount.Balance += request.usdAmount;
             var Transaction = new Transaction
@@ -74,8 +76,8 @@ namespace Wallet.Services
                 Description = $"Bought {request.usdAmount} USD",
                 CreatedAt = DateTime.UtcNow
             };
-            _context.Transactions.Add(Transaction);
-            await _context.SaveChangesAsync();
+            _uow.Transactions.AddAsync(Transaction);
+            await _uow.SaveChangesAsync();
 
             return usdAccount;
         }

@@ -1,0 +1,64 @@
+## Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vscode/
+.vs/
+
+## Visual Studio
+.vscode/
+*.code-workspace
+
+## NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Backup & generated files
+*_i.c
+*_p.c
+*_h.h
+*.tmp
+*.bak
+*.log
+*.vspscc
+*.vssscc
+
+## Publish output
+publish/
+*.Publish.xml
+*.pubxml
+*.pubxml.user
+
+## Resharper
+_ReSharper*/
+*.DotSettings.user
+
+## Rider
+.idea/
+
+## OS files
+.DS_Store
+Thumbs.db
+
+## Secrets / configs
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+.env

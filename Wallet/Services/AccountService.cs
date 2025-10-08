@@ -11,11 +11,11 @@ using Wallet.Entities.DTO;
 
 namespace Wallet.Services
 {
-    public class AccountService(WalletDbContext context, IConfiguration configuration) : IAccountService
+    public class AccountService(WalletDbContext context, IConfiguration configuration, IUnitOfWork uow) : IAccountService
     {
         public async Task<Account> AddBalanceAsync(BalanceDTO dto, Guid userId)
         {
-            var account = await context.Accounts.FirstOrDefaultAsync(x => x.UserId == userId && dto.CurrencyType == x.CurrencyType);
+            var account = await uow.Accounts.Query().FirstOrDefaultAsync(x => x.UserId == userId && dto.CurrencyType == x.CurrencyType);
 
             if (account == null)
                 return null;
@@ -33,15 +33,15 @@ namespace Wallet.Services
             };
             context.Transactions.Add(transaction);
 
-            await context.SaveChangesAsync();
+            await uow.SaveChangesAsync();
             return account;
         }
 
         public async Task<Account?> CreateAccountAsync(AccountDTO dto, Guid userId)
         {
           
-            var existingAccount = await context.Accounts
-                   .FirstOrDefaultAsync(a => a.UserId == userId && a.CurrencyType == dto.CurrencyType);
+            var existingAccount = await uow.Accounts
+                   .Query().FirstOrDefaultAsync(a => a.UserId == userId && a.CurrencyType == dto.CurrencyType);
 
             if (existingAccount != null)
                 return null; 
@@ -51,14 +51,14 @@ namespace Wallet.Services
                 UserId = userId,
                 CurrencyType = dto.CurrencyType,
             };
-            context.Accounts.Add(account);
-            await context.SaveChangesAsync();
+            uow.Accounts.AddAsync(account);
+            await uow.SaveChangesAsync();
             return account;
         }
 
         public async Task<Account> WithdrawBalanceAsync(BalanceDTO dto,Guid userId)
         {
-            var account = await context.Accounts.FirstOrDefaultAsync(x => x.UserId == userId && dto.CurrencyType == x.CurrencyType);
+            var account = await uow.Accounts.Query().FirstOrDefaultAsync(x => x.UserId == userId && dto.CurrencyType == x.CurrencyType);
 
             if (account == null)
                 return null;
@@ -76,8 +76,8 @@ namespace Wallet.Services
                 Description = $"Withdraw {dto.Balance} {dto.CurrencyType}",
                 CreatedAt = DateTime.UtcNow
             };
-            context.Transactions.Add(transaction);
-            await context.SaveChangesAsync();
+            uow.Transactions.AddAsync(transaction);
+            await uow.SaveChangesAsync();
             return account;
         }
     }
